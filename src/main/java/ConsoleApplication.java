@@ -4,6 +4,8 @@ public class ConsoleApplication {
         SudokuGame sudokuGame = new SudokuGame();
         BoardGenerator.generateBoard(sudokuGame.getBoard());
         PlayerInput.getValueFromPlayer(sudokuGame);
+        ValueChecker valueChecker = new ValueChecker(sudokuGame);
+        valueChecker.valueCheck();
 
 //        boolean gameFinished = false;
 //

@@ -26,6 +26,10 @@ public class SudokuElement {
         return value;
     }
 
+    public HashSet<Integer> getPossibleValues() {
+        return possibleValues;
+    }
+
     public void setValue(int value) {
         this.value = value;
     }
