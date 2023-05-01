@@ -118,35 +118,11 @@ public class ValueChecker {
     private void valueInsert() {
         for(ArrayList<SudokuElement> list :  columns) {
             for (SudokuElement elementChecked : list) {
-                for(Integer i=0; i<9; i++) {
-                    if(elementChecked.getPossibleValues().contains(i)) {
-                        elementChecked.setValue(i);
-                        possibleValuesChecker();
-                        break;
-                    }
-                }
-            }
-        }
-
-        for(ArrayList<SudokuElement> list :  rows) {
-            for (SudokuElement elementChecked : list) {
-                for(Integer i=0; i<9; i++) {
-                    if(elementChecked.getPossibleValues().contains(i)) {
-                        elementChecked.setValue(i);
-                        possibleValuesChecker();
-                        break;
-                    }
-                }
-            }
-        }
-
-        for(ArrayList<SudokuElement> list :  sectors) {
-            for (SudokuElement elementChecked : list) {
-                for(Integer i=0; i<9; i++) {
-                    if(elementChecked.getPossibleValues().contains(i)) {
-                        elementChecked.setValue(i);
-                        possibleValuesChecker();
-                        break;
+                if(elementChecked.getPossibleValues().size()==1 && elementChecked.getValue()==-1) {
+                    for(Integer i=1; i<10; i++){
+                        if(elementChecked.getPossibleValues().contains(i)){
+                            elementChecked.setValue(i);
+                        }
                     }
                 }
             }
@@ -155,8 +131,10 @@ public class ValueChecker {
 
     public void valueCheck() {
         generateGroups();
-        possibleValuesChecker();
-        valueInsert();
+        for(int i=0; i<81; i++) {
+            possibleValuesChecker();
+            valueInsert();
+        }
         BoardGenerator.generateBoard(sudokuBoard);
     }
 }
