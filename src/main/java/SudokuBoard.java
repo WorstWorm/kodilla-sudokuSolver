@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class SudokuBoard {
+public class SudokuBoard extends Prototype<SudokuBoard> {
     private ArrayList<SudokuRow> rowList;
 
     public SudokuBoard() {
@@ -10,21 +10,6 @@ public class SudokuBoard {
         }
     }
 
-    //do usunięcia ==================================================
-    public SudokuBoard(boolean mock) {
-        rowList = new ArrayList<>();
-
-        for(int i=0; i<9; i++) {
-            ArrayList<SudokuElement> elementList = new ArrayList<>();
-            for(int j=0; j<9; j++) {
-                elementList.add(new SudokuElement(j));
-            }
-            SudokuRow row = new SudokuRow(elementList);
-            rowList.add(row);
-        }
-    }
-    //===============================================================
-
     public ArrayList<SudokuRow> getRowList() {
         return rowList;
     }
@@ -32,6 +17,15 @@ public class SudokuBoard {
     public void putNewValue(FieldDTO fieldDTO) {
             rowList.get(fieldDTO.row() - 1).getElementList().get(fieldDTO.column() - 1).setValue(fieldDTO.value());
             BoardGenerator.generateBoard(this);
+    }
+
+    public SudokuBoard deepCopy() throws CloneNotSupportedException {
+        SudokuBoard clonedBoard = super.clone();
+        clonedBoard.rowList = new ArrayList<>();
+        for(int i=0; i<this.rowList.size(); i++) {
+            clonedBoard.rowList.add(i, this.rowList.get(i).deepCopy());
+        }
+        return clonedBoard;
     }
 
 }

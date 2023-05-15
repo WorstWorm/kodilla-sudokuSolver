@@ -1,20 +1,20 @@
-import com.sun.jdi.Value;
-
 import java.util.ArrayList;
 
 public class ValueChecker {
 
     SudokuBoard sudokuBoard;
-    ArrayList<ArrayList<SudokuElement>> columns = new ArrayList<ArrayList<SudokuElement>>();
-    ArrayList<ArrayList<SudokuElement>> rows = new ArrayList<ArrayList<SudokuElement>>();
-    ArrayList<ArrayList<SudokuElement>> sectors = new ArrayList<ArrayList<SudokuElement>>();
+    ArrayList<ArrayList<SudokuElement>> columns = new ArrayList<>();
+    ArrayList<ArrayList<SudokuElement>> rows = new ArrayList<>();
+    ArrayList<ArrayList<SudokuElement>> sectors = new ArrayList<>();
+    boolean changesFlag = true;
+    boolean error = false;
 
     public ValueChecker(SudokuGame game) {
         this.sudokuBoard = game.getBoard();
         for(int i=0; i<9; i++) {
-            this.columns.add(new ArrayList<SudokuElement>());
-            this.rows.add(new ArrayList<SudokuElement>());
-            this.sectors.add(new ArrayList<SudokuElement>());
+            this.columns.add(new ArrayList<>());
+            this.rows.add(new ArrayList<>());
+            this.sectors.add(new ArrayList<>());
         }
     }
 
@@ -86,10 +86,16 @@ public class ValueChecker {
         }
     }
 
-    private void possibleValuesChecker() {
+    private boolean possibleValuesChecker() {
         for(ArrayList<SudokuElement> list :  columns) {
             for(SudokuElement elementChecked : list) {
                 int tempValue = elementChecked.getValue();
+                for(SudokuElement elementWithValue : list)  {
+                    if(!elementChecked.equals(elementWithValue) && elementChecked.getValue() == elementWithValue.getValue() && elementChecked.getValue()!=-1) {
+                        System.out.println("This sudoku has no solution.");
+                        return false;
+                    }
+                }
                 for(SudokuElement elementModified : list) {
                     elementModified.removePossibleValue(tempValue);
                 }
@@ -99,6 +105,12 @@ public class ValueChecker {
         for(ArrayList<SudokuElement> list :  rows) {
             for(SudokuElement elementChecked : list) {
                 int tempValue = elementChecked.getValue();
+                for(SudokuElement elementWithValue : list)  {
+                    if(!elementChecked.equals(elementWithValue) && elementChecked.getValue() == elementWithValue.getValue() && elementChecked.getValue()!=-1) {
+                        System.out.println("This sudoku has no solution.");
+                        return false;
+                    }
+                }
                 for(SudokuElement elementModified : list) {
                     elementModified.removePossibleValue(tempValue);
                 }
@@ -108,22 +120,34 @@ public class ValueChecker {
         for(ArrayList<SudokuElement> list :  sectors) {
             for(SudokuElement elementChecked : list) {
                 int tempValue = elementChecked.getValue();
+                for(SudokuElement elementWithValue : list)  {
+                    if(!elementChecked.equals(elementWithValue) && elementChecked.getValue() == elementWithValue.getValue() && elementChecked.getValue()!=-1) {
+                        System.out.println("This sudoku has no solution3.");
+                        return false;
+                    }
+                }
                 for(SudokuElement elementModified : list) {
                     elementModified.removePossibleValue(tempValue);
                 }
             }
         }
+        return true;
     }
 
     private void valueInsert() {
-        for(ArrayList<SudokuElement> list :  columns) {
+        outer: for(ArrayList<SudokuElement> list :  columns) {
             for (SudokuElement elementChecked : list) {
                 if(elementChecked.getPossibleValues().size()==1 && elementChecked.getValue()==-1) {
-                    for(Integer i=1; i<10; i++){
+                    for(int i = 1; i<10; i++){
                         if(elementChecked.getPossibleValues().contains(i)){
                             elementChecked.setValue(i);
+                            changesFlag = true;
                         }
                     }
+                } else if (elementChecked.getPossibleValues().size()<1 && elementChecked.getValue()==-1) {
+                    System.out.println("This sudoku has no solution4.");
+                    error = true;
+                    break outer;
                 }
             }
         }
@@ -131,9 +155,16 @@ public class ValueChecker {
 
     public void valueCheck() {
         generateGroups();
-        for(int i=0; i<81; i++) {
+        while(changesFlag) {
+            changesFlag = false;
             possibleValuesChecker();
             valueInsert();
+            if(error) {
+                break;
+            }
+            if(!changesFlag){
+                ValueGuesser.guess();
+            }
         }
         BoardGenerator.generateBoard(sudokuBoard);
     }

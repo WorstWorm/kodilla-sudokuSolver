@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class SudokuElement {
@@ -37,4 +38,5 @@ public class SudokuElement {
     public void removePossibleValue(int value) {
         possibleValues.remove(value);
     }
+
 }
