@@ -43,7 +43,6 @@ public class SudokuGame {
         this.getBoard().putNewValue(new FieldDTO(5,9,8));
         this.getBoard().putNewValue(new FieldDTO(8,9,7));
         this.getBoard().putNewValue(new FieldDTO(9,9,9));
-
         //=============================================================
     }
 

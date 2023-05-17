@@ -3,91 +3,21 @@ import java.util.ArrayList;
 public class ValueChecker {
 
     SudokuBoard sudokuBoard;
-    ArrayList<ArrayList<SudokuElement>> columns = new ArrayList<>();
-    ArrayList<ArrayList<SudokuElement>> rows = new ArrayList<>();
-    ArrayList<ArrayList<SudokuElement>> sectors = new ArrayList<>();
-    boolean changesFlag = true;
+
+    GroupDTO groupDTO = new GroupDTO(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     boolean error = false;
 
-    public ValueChecker(SudokuGame game) {
-        this.sudokuBoard = game.getBoard();
+    public ValueChecker(SudokuBoard sudokuBoard) {
+        this.sudokuBoard = sudokuBoard;
         for(int i=0; i<9; i++) {
-            this.columns.add(new ArrayList<>());
-            this.rows.add(new ArrayList<>());
-            this.sectors.add(new ArrayList<>());
-        }
-    }
-
-    private void generateGroups() {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                columns.get(i).add(sudokuBoard.getRowList().get(j).getElementList().get(i));
-            }
-        }
-
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                rows.get(i).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                sectors.get(0).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 3; i < 6; i++) {
-            for (int j = 0; j < 3; j++) {
-                sectors.get(1).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 6; i < 8; i++) {
-            for (int j = 0; j < 3; j++) {
-                sectors.get(2).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 3; j < 6; j++) {
-                sectors.get(3).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 3; i < 6; i++) {
-            for (int j = 3; j < 6; j++) {
-                sectors.get(4).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 6; i < 8; i++) {
-            for (int j = 3; j < 6; j++) {
-                sectors.get(5).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 6; j < 9; j++) {
-                sectors.get(6).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 3; i < 6; i++) {
-            for (int j = 6; j < 9; j++) {
-                sectors.get(7).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
-        }
-
-        for (int i = 6; i < 8; i++) {
-            for (int j = 6; j < 9; j++) {
-                sectors.get(8).add(sudokuBoard.getRowList().get(i).getElementList().get(j));
-            }
+            this.groupDTO.columns().add(new ArrayList<>());
+            this.groupDTO.rows().add(new ArrayList<>());
+            this.groupDTO.sectors().add(new ArrayList<>());
         }
     }
 
     private boolean possibleValuesChecker() {
-        for(ArrayList<SudokuElement> list :  columns) {
+        for(ArrayList<SudokuElement> list :  groupDTO.columns()) {
             for(SudokuElement elementChecked : list) {
                 int tempValue = elementChecked.getValue();
                 for(SudokuElement elementWithValue : list)  {
@@ -102,7 +32,7 @@ public class ValueChecker {
             }
         }
 
-        for(ArrayList<SudokuElement> list :  rows) {
+        for(ArrayList<SudokuElement> list :  groupDTO.rows()) {
             for(SudokuElement elementChecked : list) {
                 int tempValue = elementChecked.getValue();
                 for(SudokuElement elementWithValue : list)  {
@@ -117,7 +47,7 @@ public class ValueChecker {
             }
         }
 
-        for(ArrayList<SudokuElement> list :  sectors) {
+        for(ArrayList<SudokuElement> list :  groupDTO.sectors()) {
             for(SudokuElement elementChecked : list) {
                 int tempValue = elementChecked.getValue();
                 for(SudokuElement elementWithValue : list)  {
@@ -134,14 +64,15 @@ public class ValueChecker {
         return true;
     }
 
-    private void valueInsert() {
-        outer: for(ArrayList<SudokuElement> list :  columns) {
+    private boolean valueInsert() {
+        boolean changesHaveBeenMade = false;
+        outer: for(ArrayList<SudokuElement> list :  groupDTO.columns()) {
             for (SudokuElement elementChecked : list) {
                 if(elementChecked.getPossibleValues().size()==1 && elementChecked.getValue()==-1) {
                     for(int i = 1; i<10; i++){
                         if(elementChecked.getPossibleValues().contains(i)){
                             elementChecked.setValue(i);
-                            changesFlag = true;
+                            changesHaveBeenMade = true;
                         }
                     }
                 } else if (elementChecked.getPossibleValues().size()<1 && elementChecked.getValue()==-1) {
@@ -149,11 +80,12 @@ public class ValueChecker {
                     error = true;
                     break outer;
                 }
+                return changesHaveBeenMade;
             }
         }
     }
 
-    public void valueCheck() {
+    public void valueCheck() throws CloneNotSupportedException {
         generateGroups();
         while(changesFlag) {
             changesFlag = false;
@@ -163,9 +95,9 @@ public class ValueChecker {
                 break;
             }
             if(!changesFlag){
-                ValueGuesser.guess();
+                System.out.println("guess");
+                }
             }
-        }
         BoardGenerator.generateBoard(sudokuBoard);
     }
 }
